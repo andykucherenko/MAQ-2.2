@@ -8,6 +8,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -24,6 +25,8 @@ class ChangeTextTest {
 
     private lateinit var device: UiDevice
     private val textToSet = "Netology"
+    private val textSpaces = "     ";
+    private val textEmpty = "";
 
 //    @Test
 //    fun testInternetSettings() {
@@ -75,8 +78,10 @@ class ChangeTextTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val intent = context.packageManager.getLaunchIntentForPackage(packageName)
         context.startActivity(intent)
+
         device.wait(Until.hasObject(By.pkg(packageName)), TIMEOUT)
     }
+
 
     @Before
     fun beforeEachTest() {
@@ -88,6 +93,17 @@ class ChangeTextTest {
         val launcherPackage = device.launcherPackageName
         device.wait(Until.hasObject(By.pkg(launcherPackage)), TIMEOUT)
     }
+
+//    @After
+//    fun afterEachTest() {
+//        // Press home
+//        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+//        device.pressHome()
+//
+//        // Wait for launcher
+//        val launcherPackage = device.launcherPackageName
+//        device.wait(Until.hasObject(By.pkg(launcherPackage)), TIMEOUT)
+//    }
 
     @Test
     fun testInternetSettings() {
@@ -108,9 +124,50 @@ class ChangeTextTest {
 
         val result = device.findObject(By.res(packageName, "textToBeChanged")).text
         assertEquals(result, textToSet)
+
+//        Thread.sleep(5000);
+    }
+
+    @Test
+    fun testTextSpaces() {
+        val packageName = MODEL_PACKAGE
+        waitForPackage(packageName)
+
+        val initialText = device.findObject(By.res(packageName, "textToBeChanged")).text
+
+        device.findObject(By.res(packageName, "userInput")).text = textSpaces
+        device.findObject(By.res(packageName, "buttonChange")).click()
+
+        val result = device.findObject(By.res(packageName, "textToBeChanged")).text
+        assertEquals(result, initialText)
+    }
+
+    @Test
+    fun testTextEmpty() {
+        val packageName = MODEL_PACKAGE
+        waitForPackage(packageName)
+
+        val initialText = device.findObject(By.res(packageName, "textToBeChanged")).text
+
+        device.findObject(By.res(packageName, "userInput")).text = textEmpty
+        device.findObject(By.res(packageName, "buttonChange")).click()
+
+        val result = device.findObject(By.res(packageName, "textToBeChanged")).text
+        assertEquals(result, initialText)
+    }
+
+    @Test
+    fun testOpenNewActivity() {
+        val packageName = MODEL_PACKAGE
+        waitForPackage(packageName)
+
+        device.findObject(By.res(packageName, "userInput")).text = textToSet
+        device.findObject(By.res(packageName, "buttonActivity")).click()
+
+        waitForPackage(packageName)
+
+        val result = device.findObject(By.res(packageName, "text")).text
+        assertEquals(result, textToSet)
     }
 
 }
-
-
-
